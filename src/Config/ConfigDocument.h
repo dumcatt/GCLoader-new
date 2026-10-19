@@ -41,6 +41,8 @@ namespace gc::config
         enable_absolute_time_judgement{false};
         rfl::Rename<"enable_auto_play", bool>
         enable_auto_play{false};
+        rfl::Rename<"enable_real_cabinet_io", bool>
+        enable_real_cabinet_io{false};
         rfl::Rename<"enable_testmode_storage_redirect", bool>
         enable_testmode_storage_redirect{false};
         rfl::Rename<"enable_timer_freeze_patches", bool>

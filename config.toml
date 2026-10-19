@@ -72,6 +72,7 @@ enable_testmode_storage_redirect = false
 enable_timer_freeze_patches = false
 unlock_all_songs_and_difficulties = false
 enable_nesys_service_adapter_patch = true
+enable_real_cabinet_io = false
 enable_windowed_widescreen_stage = false
 widescreen_window_width = 1920
 widescreen_window_height = 1280

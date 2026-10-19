@@ -29,19 +29,28 @@ constexpr std::array<Rva, 4> kRvas206{0x000A3FF6, 0x000F7E9B, 0x000F90F6, 0x002B
 constexpr auto kOriginal = Operations(SiteDisposition::install, kRvas471);
 constexpr auto kLegacyPatched = Operations(SiteDisposition::already_installed, kRvas471);
 constexpr auto kOriginal206 = Operations(SiteDisposition::install, kRvas206);
+// Real cabinet I/O keeps only native_mouse_events (index 0) from each set.
+constexpr auto kRealIo471 = std::array<VersionedOperation, 1>{kOriginal[0]};
+constexpr auto kRealIo206 = std::array<VersionedOperation, 1>{kOriginal206[0]};
 }
 std::expected<game_version::FeaturePlan, game_version::PlanError> BuildGameCompatibilityPlan(
-    game_version::GameBuild build, game_version::GameImageVariant variant) noexcept {
+    game_version::GameBuild build, game_version::GameImageVariant variant, bool real_cabinet_io) noexcept {
     if (build == GameBuild::groove_coaster_471) {
         switch (variant) {
         case GameImageVariant::clean:
-        case GameImageVariant::locally_verified: return FeaturePlan{FeatureId::game_compatibility, kOriginal, {}};
-        case GameImageVariant::legacy_patched: return FeaturePlan{FeatureId::game_compatibility, kLegacyPatched, {}};
+        case GameImageVariant::locally_verified:
+            if (real_cabinet_io) return FeaturePlan{FeatureId::game_compatibility, kRealIo471, {}};
+            return FeaturePlan{FeatureId::game_compatibility, kOriginal, {}};
+        case GameImageVariant::legacy_patched:
+            if (real_cabinet_io) break;
+            return FeaturePlan{FeatureId::game_compatibility, kLegacyPatched, {}};
         }
     }
     if (build == GameBuild::groove_coaster_206 &&
-        (variant == GameImageVariant::clean || variant == GameImageVariant::locally_verified))
+        (variant == GameImageVariant::clean || variant == GameImageVariant::locally_verified)) {
+        if (real_cabinet_io) return FeaturePlan{FeatureId::game_compatibility, kRealIo206, {}};
         return FeaturePlan{FeatureId::game_compatibility, kOriginal206, {}};
+    }
     return std::unexpected(PlanError{.stage = PlanStage::unsupported_feature,
         .feature = FeatureId::game_compatibility});
 }

@@ -79,6 +79,11 @@ namespace gc::config
             return unlock_all_songs_and_difficulties_;
         }
 
+        [[nodiscard]] bool enable_real_cabinet_io() const noexcept
+        {
+            return enable_real_cabinet_io_;
+        }
+
         [[nodiscard]] const windowed_widescreen::WindowedWidescreenSettings&
         windowed_widescreen() const noexcept
         {
@@ -99,7 +104,8 @@ namespace gc::config
             windowed_widescreen::WindowedWidescreenSettings
                 windowed_widescreen,
             bool enable_auto_play,
-            bool unlock_all_songs_and_difficulties);
+            bool unlock_all_songs_and_difficulties,
+            bool enable_real_cabinet_io);
 
         friend class ConfigCompiler;
         logging::LoggingSettings logging_;
@@ -115,6 +121,7 @@ namespace gc::config
             windowed_widescreen_;
         bool enable_auto_play_{};
         bool unlock_all_songs_and_difficulties_{};
+        bool enable_real_cabinet_io_{};
     };
 
     class ConfigCompiler final

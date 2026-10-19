@@ -17,11 +17,13 @@ struct GamePathState final {
 };
 }
 std::expected<void, win32_hooks::RegistrationError> ComposeGameWin32Handlers(
-    win32_hooks::Kernel32Dispatcher& dispatcher, rfid::Runtime& rfid,
+    win32_hooks::Kernel32Dispatcher& dispatcher, rfid::Runtime* rfid,
     system_path::SystemPathRouter& system, testmode_storage::Hooks& storage) noexcept {
     // Explicit policy order: RFID -> system roots -> test-mode storage.
     // Each contributor registers only its baseline APIs and enabled routes.
-    if (const auto result = rfid::AddWin32FileHandlers(dispatcher, rfid); !result) return result;
+    if (rfid != nullptr) {
+        if (const auto result = rfid::AddWin32FileHandlers(dispatcher, *rfid); !result) return result;
+    }
     if (const auto result = system_path::AddWin32PathHandlers(dispatcher, system); !result) return result;
     if (const auto result = testmode_storage::AddWin32PathHandlers(dispatcher, storage); !result) return result;
     if (const auto result = nesys_service::diagnostics::AddGamePipeWin32Observers(dispatcher); !result)
@@ -30,7 +32,7 @@ std::expected<void, win32_hooks::RegistrationError> ComposeGameWin32Handlers(
 }
 std::expected<void, StartupError> AddGameWin32Hooks(
     hooking::HookPlan& plan, const system_path::RuntimeRoot& root,
-    bool storage_enabled, rfid::Runtime& rfid) noexcept {
+    bool storage_enabled, rfid::Runtime* rfid) noexcept {
     try {
         // Handler state and TTX original storage live for the entire process.
         auto* state = new GamePathState(root, storage_enabled);

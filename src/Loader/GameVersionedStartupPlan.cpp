@@ -47,7 +47,7 @@ PrepareGameVersionedStartup(HMODULE process_module, const config::ValidatedConfi
         previous = feature->feature;
         return {};
     };
-    if (auto r = append(game_compatibility::BuildGameCompatibilityPlan(build, variant), true); !r)
+    if (auto r = append(game_compatibility::BuildGameCompatibilityPlan(build, variant, settings.enable_real_cabinet_io()), true); !r)
         return std::unexpected(r.error());
     if (settings.enable_auto_play())
         if (auto r = append(auto_play::BuildAutoPlayPlan(build, variant, true)); !r) return std::unexpected(r.error());

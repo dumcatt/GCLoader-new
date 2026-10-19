@@ -32,7 +32,8 @@ namespace gc::config
         windowed_widescreen::WindowedWidescreenSettings
             windowed_widescreen,
         const bool enable_auto_play,
-        bool unlock_all_songs_and_difficulties)
+        bool unlock_all_songs_and_difficulties,
+        const bool enable_real_cabinet_io)
         : logging_(std::move(logging)),
           input_(std::move(input)),
           switch_input_(std::move(switch_input)),
@@ -45,7 +46,8 @@ namespace gc::config
           windowed_widescreen_(std::move(windowed_widescreen)),
           enable_auto_play_(enable_auto_play),
           unlock_all_songs_and_difficulties_(
-              unlock_all_songs_and_difficulties)
+              unlock_all_songs_and_difficulties),
+          enable_real_cabinet_io_(enable_real_cabinet_io)
     {
     }
 
@@ -276,6 +278,7 @@ namespace gc::config
                 document.experimental().enable_auto_play(),
                 document.experimental()
                         .unlock_all_songs_and_difficulties(),
+                document.experimental().enable_real_cabinet_io(),
             };
         }
         catch (const std::exception& error)

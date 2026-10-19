@@ -4,6 +4,7 @@
 #include "Audio/AudioFeature.h"
 #include "Audio/Asio/AsioCloseHook.h"
 #include "Input/Polling/InputPollingRuntime.h"
+#include "Driver/iDmac/RealDriver.h"
 #include "Input/Win32/ImeSuppression.h"
 #include "Input/Switch/SwitchInputPatch.h"
 #include "Patches/AutoPlay/AutoPlayPatch.h"
@@ -41,8 +42,14 @@ std::expected<void, StartupError> StartGame(HMODULE loader_module, GameProcessCo
         if (const auto ime = input::DisableProcessIme(); !ime)
             return std::unexpected(StartupError{.stage = StartupStage::ime, .win32_error = ime.error().win32_error});
         PLOG_INFO << "Input IME suppression active api=ImmDisableIME thread_selector=all";
-        if (auto input = input::ConfigureInputPollingRuntime(settings.input()); !input)
+        if (settings.enable_real_cabinet_io()) {
+            // The original iDmacDrv32 driver owns input; emulated polling stays unconfigured.
+            driver::RequestRealIDmacDriver(loader_module);
+            PLOG_INFO << "Real cabinet I/O: iDmacDrv32 exports forwarded to iDmacDrv32_real.dll; "
+                "keyboard/controller polling and COM2 RFID emulation disabled";
+        } else if (auto input = input::ConfigureInputPollingRuntime(settings.input()); !input) {
             return std::unexpected(StartupError{.stage = StartupStage::input, .detail = std::move(input.error())});
+        }
         if (auto audio = audio::PublishAudioFeature(std::move(startup->audio), *exports); !audio)
             return std::unexpected(StartupError{.stage = StartupStage::feature,
                 .feature = "Audio", .operation = "runtime_publication",

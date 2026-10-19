@@ -84,6 +84,7 @@ target_link_libraries(gc_nesys_startup
 add_library(iDmacDrv32 SHARED
         Loader/DllMain.cpp
         Driver/iDmac/iDmacDrv32.cpp
+        Driver/iDmac/RealDriver.cpp
 )
 set_target_properties(iDmacDrv32 PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${GC_DIST_DIR}"
